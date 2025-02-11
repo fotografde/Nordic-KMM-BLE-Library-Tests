@@ -43,6 +43,13 @@ import scanner.IoTDevice
 import scanner.Scanner
 import utils.toEntaggedUuid
 
+
+val advertisementUuids = listOf(
+    "0500".toEntaggedUuid(),
+    "0900".toEntaggedUuid(),
+    "E7DD".toEntaggedUuid()
+)
+
 class ScannerViewModel : ScreenModel, KoinComponent {
 
     private val scanner: Scanner by inject()

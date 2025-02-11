@@ -41,17 +41,29 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import scanner.IoTDevice
 import scanner.Scanner
+import utils.toEntaggedUuid
 
 class ScannerViewModel : ScreenModel, KoinComponent {
 
     private val scanner: Scanner by inject()
 
     private val _state = MutableStateFlow(emptyList<IoTDevice>())
+    private val advertisementUuids = listOf(
+        "0500".toEntaggedUuid(),
+        "0900".toEntaggedUuid(),
+        "E7DD".toEntaggedUuid()
+    )
     val state = _state.asStateFlow()
 
     init {
-        scanner.scan()
-            .onEach { _state.value = (_state.value + it).distinctBy { it.address } }
+        scanner.scan(
+            advertisementUuids
+        )
+            .onEach {
+//                _state.value =
+//                    it.filter { it.services.any { service -> service in advertisementUuids } }
+                _state.value = (_state.value + it).distinctBy { it.address }
+            }
             .launchIn(screenModelScope)
     }
 }

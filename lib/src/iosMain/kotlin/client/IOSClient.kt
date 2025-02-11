@@ -31,6 +31,7 @@
 
 package client
 
+import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuidFrom
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.channels.awaitClose
@@ -89,10 +90,14 @@ class IOSClient : NSObject(), CBCentralManagerDelegateProtocol, CBPeripheralDele
         services?.onEvent(event)
     }
 
-    fun scan(): Flow<List<IoTDevice>> {
+    fun scan(advertisementUuidFilter: List<Uuid>): Flow<List<IoTDevice>> {
         return callbackFlow {
             bleState.first { it == CBCentralManagerStatePoweredOn }
-            manager.scanForPeripheralsWithServices(null, null)
+
+            manager.scanForPeripheralsWithServices(
+                serviceUUIDs = advertisementUuidFilter.map { it.toCBUUID() },
+                options = null
+            )
 
             scannedDevices.onEach {
                 trySend(it)
@@ -275,14 +280,15 @@ class IOSClient : NSObject(), CBCentralManagerDelegateProtocol, CBPeripheralDele
         val ioTDevice = IoTDevice(PeripheralDevice(didDiscoverPeripheral))
         Napier.d { "${advertisementData[CBAdvertisementDataServiceUUIDsKey]}" }
         val uuid = try {
-            (advertisementData[CBAdvertisementDataServiceUUIDsKey] as? List<CBUUID>)?.first()?.toUuid()
+            (advertisementData[CBAdvertisementDataServiceUUIDsKey] as? List<CBUUID>)?.first()
+                ?.toUuid()
         } catch (e: Exception) {
             null
         }
         Napier.d { "Uuid: $uuid" }
-        if (uuid != BLINKY_SERVICE_UUID) {
-            return
-        }
+//        if (uuid != BLINKY_SERVICE_UUID) {
+//            return
+//        }
         _scannedDevices.value = _scannedDevices.value + ioTDevice
     }
 

@@ -33,20 +33,39 @@ package scanner
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.ParcelUuid
+import android.util.Log
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import no.nordicsemi.android.kotlin.ble.core.scanner.BleScanFilter
+import no.nordicsemi.android.kotlin.ble.core.scanner.FilteredServiceUuid
 import no.nordicsemi.android.kotlin.ble.scanner.BleScanner
 
 actual class Scanner(private val context: Context) {
 
     @SuppressLint("MissingPermission")
-    actual fun scan(): Flow<List<IoTDevice>> {
+    actual fun scan(advertisementUuidFilter: List<Uuid>): Flow<List<IoTDevice>> {
         val scanner = BleScanner(context)
-
         val result = mutableListOf<IoTDevice>()
 
-        return scanner.scan().map { IoTDevice(it.device) }
+        return scanner.scan(
+            filters = advertisementUuidFilter.map {
+                BleScanFilter(
+                    serviceUuid = FilteredServiceUuid(
+                        ParcelUuid(it)
+                    )
+                )
+            }
+        )
+            .onEach { Log.w("Scanner", "found device, ${it}") }
+            .map { result ->
+                IoTDevice(
+                    device = result.device,
+//                    services = result.data?.scanRecord?.serviceUuids?.map { it.uuid } ?: emptyList()
+                )
+            }
             .onEach { result += it }
             .map { result }
             .map { it.distinctBy { it.address } }

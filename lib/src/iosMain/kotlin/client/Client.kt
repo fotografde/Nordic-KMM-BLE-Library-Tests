@@ -31,6 +31,7 @@
 
 package client
 
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import scanner.IoTDevice
@@ -40,8 +41,8 @@ actual class Client(
     private val client: IOSClientWrapper
 ) {
 
-    fun scan(): Flow<List<IoTDevice>> {
-        return client.value.scan()
+    fun scan(advertisementUuidFilter: List<Uuid>): Flow<List<IoTDevice>> {
+        return client.value.scan(advertisementUuidFilter)
     }
 
     actual suspend fun connect(device: IoTDevice, scope: CoroutineScope) {

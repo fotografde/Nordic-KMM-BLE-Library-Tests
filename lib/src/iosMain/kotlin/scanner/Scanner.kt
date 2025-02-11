@@ -32,9 +32,11 @@
 package scanner
 
 import client.IOSClientWrapper
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.flow.Flow
 
 actual class Scanner(private val client: IOSClientWrapper) {
 
-    actual fun scan(): Flow<List<IoTDevice>> = client.value.scan()
+    actual fun scan(advertisementUuidFilter: List<Uuid>): Flow<List<IoTDevice>> =
+        client.value.scan(advertisementUuidFilter)
 }

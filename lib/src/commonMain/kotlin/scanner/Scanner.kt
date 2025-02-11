@@ -31,9 +31,10 @@
 
 package scanner
 
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.flow.Flow
 
 expect class Scanner {
 
-    fun scan(): Flow<List<IoTDevice>>
+    fun scan(advertisementUuidFilter: List<Uuid>): Flow<List<IoTDevice>>
 }

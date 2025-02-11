@@ -74,6 +74,8 @@ kotlin {
                 implementation(libs.kmm.uuid)
                 implementation(libs.kmm.logs)
                 implementation(libs.kmm.voyager)
+                implementation("cafe.adriel.voyager:voyager-screenmodel:1.0.0")
+
             }
         }
         val androidMain by getting {
